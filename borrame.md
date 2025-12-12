@@ -1,52 +1,48 @@
-# Algoritmo Genético: Resultados de la Ejecución Única
+# Algoritmo PSO: Resultados de la ejecución única
 
 ## Función objetivo
 $$f(x, y) = \sin(x) \cdot e^{(1-\cos(y))^2} + \cos(y) \cdot e^{(1-\sin(x))^2} + (x-y)^2$$
 
 Dominio: $-2\pi \leq x \leq 2\pi$, $-2\pi \leq y \leq 2\pi$. Objetivo: minimizar $f(x,y)$.
 
-## Configuración utilizada (main.py)
-- Población: 50 individuos
-- Generaciones: 500
-- Cruza: un punto, $p_c = 0.25$
-- Mutación: inversión de bits, $p_m = 0.01$
-- Selección: ruleta (elitismo de 2 individuos)
-- Representación: binaria, 17 bits para $x$ y 17 bits para $y$ (precisión 4 decimales)
-- Óptimo numérico de referencia: $x^* = 0.665277$, $y^* = 0.905519$, $f(x^*, y^*) = 1.487019$ (L-BFGS-B)
+## Configuración usada (main.py)
+- Población: 30 partículas.
+- Iteraciones: 500 (criterio de paro).
+- Inercia: $w$ decreciente 0.9 → 0.4.
+- Coeficientes: $c_1 = 2.0$ (cognitivo), $c_2 = 2.0$ (social).
+- Topologías: `gbest` y `lbest` (vecindario = 3).
+- Velocidad máxima: 10% del rango en cada dimensión.
+- Inicialización: posiciones y velocidades aleatorias uniformes en el dominio.
+- Memoria: $pbest$ por partícula y $gbest$ o $lbest$ según topología; se actualiza en cada iteración.
 
-## Incisos solicitados (según main.py)
-- a) Función de aptitud: $\text{aptitud}(x,y)=1/(1+f(x,y))$ para transformar minimización en maximización.
-- b) Tamaño de población: 50 individuos (corrida única solicitada).
-- c) Representación: cadena binaria, 17 bits para $x$ y 17 bits para $y$ (precisión 4 decimales).
-- d) Soluciones iniciales: población aleatoria uniforme sobre los bits.
-- e) Selección: ruleta proporcional; elitismo de 2 mejores preservado.
-- f) Cruza: un punto con probabilidad $p_c=0.25$; (torneo disponible pero no usado en esta corrida).
-- g) Mutación: inversión de bits con probabilidad $p_m=0.01$ por bit.
-- h) Criterio de paro: 500 generaciones fijas.
-- i) Mejor valor hallado en esta corrida: $f=-0.998422$ en $x=3.113190$, $y=2.540244$; mejor población final reportada abajo.
+## Resultados de las corridas (5 por configuración)
+- Mejor fitness global hallado: $-106.7645367493$ (ambas topologías).
+- Mejor solución reportada: $x = -1.5821421787$, $y = -3.1302468093$, $f(x,y) = -106.7645367493$ (`PSO_gbest_estandar`).
+- Estadísticos por configuración (mejor / promedio / desviación):
+  - `PSO_gbest_estandar`: -106.7645367493 / -106.7645367493 / 0.0000000000
+  - `PSO_lbest_vecindario3`: -106.7645367493 / -106.7645367493 / 0.0000000000
 
-## Resultado de la ejecución
-- Mejor valor hallado: $f(x,y) = -0.998422$
-- Coordenadas: $x = 3.113190$, $y = 2.540244$
-- Diferencia vs. óptimo numérico de referencia: $|f - f^*| = 2.485441$
+## Convergencia (según salida estándar)
+- Ambas topologías convergen antes de la iteración 250 y permanecen estables hasta la 500.
+- Ejemplo `gbest`: a partir de iteración ~150 llega a $f \approx -106.7645$ y se mantiene.
 
-Mejores 10 individuos finales (idénticos en esta corrida):
+## Incisos solicitados (PSO)
+- a) Función objetivo: ver sección inicial.
+- b) Soluciones iniciales: posiciones y velocidades aleatorias en el dominio; $pbest$ inicial = posición inicial.
+- c) Parámetros: $w$ decreciente 0.9→0.4, $c_1=2.0$, $c_2=2.0$; topologías `gbest` y `lbest` (vecindario 3).
+- d) Memoria: $pbest$ individual y $gbest$ global (o $lbest$ por vecindario) actualizados cada iteración.
+- e) Intensificación/diversificación: $w$ decreciente (más exploración al inicio, más explotación al final); términos cognitivo/social guían hacia $pbest$ y $gbest$/$lbest$; límite de velocidad evita saltos grandes.
+- f) Criterio de paro: 500 iteraciones.
+- g) Mínimo encontrado: $f = -106.7645367493$ en $x = -1.5821421787$, $y = -3.1302468093$; la distribución final del enjambre se muestra en las gráficas de enjambre.
 
-| Rango | x | y | f(x,y) | Aptitud |
-|-------|---|---|--------|---------|
-| 1-10 | 3.113190 | 2.540244 | -0.998422 | 633.534490 |
-
-## Convergencia observada (salida estándar)
-- Gen 100: $f = -0.369287$
-- Gen 200: $f = -0.985559$
-- Gen 300: $f = -0.998422$
-- Gen 400: $f = -0.998422$
-- Gen 500: $f = -0.998422$
-
-## Visualizaciones generadas por el main
-- `convergencia.png`: evolución del mejor $f(x,y)$ por generación para la corrida única.
-- `funcion_3d.png`: superficie 3D de $f(x,y)$ en el dominio especificado.
+## Imágenes generadas (en esta carpeta)
+- `convergencia_PSO_gbest_estandar.png`
+- `convergencia_PSO_lbest_vecindario3.png`
+- `comparacion_convergencia.png`
+- `enjambre_PSO_gbest_estandar.png`
+- `enjambre_PSO_lbest_vecindario3.png`
 
 ## Comentarios
-- El GA encuentra un mínimo en torno a $f \approx -1$, diferente del óptimo numérico de referencia ($f \approx 1.49$), sugiriendo que la función es multimodal y que el optimizador local converge a otro mínimo.
-- Elitismo y la probabilidad de cruza baja mantienen la solución estable tras la generación 300.
+- Las dos topologías convergieron al mismo valor con desviación nula en 5 corridas.
+- Las gráficas de enjambre muestran concentración de partículas cerca del punto óptimo encontrado.
+- Se omite la escritura de JSON; los resultados están en la salida estándar y en las imágenes listadas.
